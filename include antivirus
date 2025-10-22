@@ -1,0 +1,40 @@
+// antivirus.h - Common declarations
+
+#ifndef ANTIVIRUS_H
+#define ANTIVIRUS_H
+
+#include <windows.h>
+#include <wincrypt.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include <time.h>
+
+#pragma comment(lib, "Advapi32.lib")
+
+#define BUF_SIZE 8192
+
+typedef struct SigNode {
+    char *hashhex;
+    struct SigNode *next;
+} SigNode;
+
+// Signatures
+SigNode* signatures_load(const char *file);
+int signatures_contains(SigNode *head, const char *hex);
+void signatures_free(SigNode *head);
+
+// Hashing
+int file_sha256(const char *path, char *out_hex);
+
+// Quarantine
+int quarantine_move(const char *quarantine_dir, const char *path);
+
+// Logging
+void log_event(const char *logfile, const char *fmt, ...);
+
+// Scanning
+void scan_path(const char *startPath, SigNode *sigs, const char *quarantine_dir, const char *logfile);
+
+#endif
